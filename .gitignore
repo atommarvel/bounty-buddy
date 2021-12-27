@@ -13,7 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
-
+/app/src/main/res/values/secrets.xml
 
 # Created by https://www.toptal.com/developers/gitignore/api/android,androidstudio,intellij,macos,vim
 # Edit at https://www.toptal.com/developers/gitignore?templates=android,androidstudio,intellij,macos,vim
