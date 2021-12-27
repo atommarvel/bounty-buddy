@@ -1,6 +1,8 @@
 package com.radiantmood.bountybuddy
 
 import android.app.Application
+import com.radiantmood.bountybuddy.auth.AuthManager
+import com.radiantmood.bountybuddy.dev.Devtool
 
 lateinit var App: BuddyBountyApp
     private set

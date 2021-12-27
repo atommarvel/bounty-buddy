@@ -13,6 +13,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.lifecycleScope
+import com.radiantmood.bountybuddy.network.RetrofitBuilder
 import com.radiantmood.bountybuddy.ui.theme.BountyBuddyTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

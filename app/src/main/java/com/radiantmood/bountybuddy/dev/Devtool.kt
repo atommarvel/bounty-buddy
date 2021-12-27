@@ -1,9 +1,10 @@
-package com.radiantmood.bountybuddy
+package com.radiantmood.bountybuddy.dev
 
 import com.facebook.flipper.android.AndroidFlipperClient
 import com.facebook.flipper.plugins.network.FlipperOkhttpInterceptor
 import com.facebook.flipper.plugins.network.NetworkFlipperPlugin
 import com.facebook.soloader.SoLoader
+import com.radiantmood.bountybuddy.App
 import okhttp3.OkHttpClient
 
 class Devtool {

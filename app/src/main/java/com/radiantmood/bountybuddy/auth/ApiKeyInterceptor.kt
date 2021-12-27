@@ -1,5 +1,7 @@
-package com.radiantmood.bountybuddy
+package com.radiantmood.bountybuddy.auth
 
+import com.radiantmood.bountybuddy.App
+import com.radiantmood.bountybuddy.R
 import okhttp3.Interceptor
 import okhttp3.Response
 

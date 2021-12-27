@@ -1,19 +1,18 @@
-package com.radiantmood.bountybuddy
+package com.radiantmood.bountybuddy.auth
 
 import android.app.Activity
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
+import com.radiantmood.bountybuddy.App
+import com.radiantmood.bountybuddy.R
+import com.radiantmood.bountybuddy.data.TokenResponse
+import com.radiantmood.bountybuddy.network.RetrofitBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -22,42 +21,20 @@ class AuthManager {
 
     val clientId get() = App.getString(R.string.oauth_client_id)
 
-    private var _authState: AuthState? = null
-    var authState: AuthState
-        private set(newValue) {
-            writeAuthState(newValue)
-            _authState = newValue
-        }
-        get() {
-            if (_authState == null) {
-                val jsonState = App.getSharedPreferences("auth", MODE_PRIVATE).getString("authState", null)
-                _authState = if (jsonState != null) {
-                    Json.decodeFromString<AuthState>(jsonState)
-                } else AuthState()
-            }
-            return _authState!!
-        }
-
-    @Serializable
-    data class AuthState(
-        val code: String? = null,
-        val token: String? = null,
-        val tokenExpiry: Int? = null,
-    )
+    var authState: AuthState by AuthStateDelegate()
 
     fun requestAuthorization(activity: Activity) {
         val uri = Uri.parse("https://www.bungie.net/en/oauth/authorize")
             .buildUpon()
             .appendQueryParameter("response_type", "code")
             .appendQueryParameter("client_id", clientId)
-            .appendQueryParameter("state", "222")
+            .appendQueryParameter("state", OAUTH_REQ_CODE)
             .build()
         CustomTabsIntent.Builder().build().launchUrl(activity, uri)
     }
 
-    private val form: MediaType = "application/x-www-form-urlencoded".toMediaType()
-
     suspend fun requestToken() {
+        val form = "application/x-www-form-urlencoded".toMediaType()
         val req = Request.Builder()
             .url("https://www.bungie.net/Platform/App/OAuth/token")
             .post("grant_type=authorization_code&code=${authState.code.orEmpty()}&client_id=${clientId}".toRequestBody(form))
@@ -70,35 +47,20 @@ class AuthManager {
         }
     }
 
-    @Serializable
-    data class TokenResponse(
-        val access_token: String,
-        val expires_in: Int,
-        val membership_id: String,
-        val token_type: String,
-    )
-
     fun parsePossibleAuthRedirect(intent: Intent) {
         //com.radiantmood.bountybuddy://v1/oauth?code=XXX&state=XXX
-        intent.data?.takeIf {
-            it.scheme == "com.radiantmood.bountybuddy" &&
-                it.host == "v1" &&
-                it.path == "/oauth" &&
-                it.getQueryParameter("state") == "222" // TODO: generate state key value
-        }?.let {
+        intent.data?.takeIf { it.isAuthRedirect() }?.let {
             val authorizationCode = it.getQueryParameter("code")
             authState = authState.copy(code = authorizationCode)
         }
     }
 
-    private fun writeAuthState(state: AuthState) {
-        val authPrefs: SharedPreferences = App.getSharedPreferences("auth", MODE_PRIVATE)
-        authPrefs.edit()
-            .putString("authState", Json.encodeToString(state))
-            .apply()
-    }
+    private fun Uri.isAuthRedirect() = (scheme == "com.radiantmood.bountybuddy" &&
+        host == "v1" &&
+        path == "/oauth" &&
+        getQueryParameter("state") == OAUTH_REQ_CODE)
 
     companion object {
-        const val OAUTH_REQ_CODE = 222
+        const val OAUTH_REQ_CODE = "222" // TODO: generate state key value
     }
 }
