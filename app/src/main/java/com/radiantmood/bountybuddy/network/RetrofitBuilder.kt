@@ -2,7 +2,7 @@ package com.radiantmood.bountybuddy.network
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.radiantmood.bountybuddy.App
-import com.radiantmood.bountybuddy.auth.ApiKeyInterceptor
+import com.radiantmood.bountybuddy.auth.AuthInterceptor
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -20,7 +20,7 @@ object RetrofitBuilder {
 
     val client by lazy {
         val builder = OkHttpClient.Builder()
-            .addInterceptor(ApiKeyInterceptor())
+            .addInterceptor(AuthInterceptor())
         App.devtool.addNetworkInterceptor(builder)
         builder.build()
     }

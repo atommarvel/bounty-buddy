@@ -5,7 +5,7 @@ import com.radiantmood.bountybuddy.R
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class ApiKeyInterceptor : Interceptor {
+class AuthInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         return chain.request().newBuilder()
             .addHeader("Authorization", "Bearer ${App.authManager.authState.token}")
