@@ -2,63 +2,89 @@ package com.radiantmood.bountybuddy
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import com.radiantmood.bountybuddy.ui.theme.BountyBuddyTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
 
-    private val authManager by lazy { AuthManager() }
+    private val authManager get() = App.authManager
+    private var responseData: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        authManager.updateAuthState(intent)
+        comp()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        authManager.parsePossibleAuthRedirect(intent)
         comp()
     }
 
     private fun comp() {
         setContent {
-            Screen(status = authManager.authState.jsonSerializeString()) {
-                authManager.login(this)
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        comp()
-    }
-
-    @Suppress("Deprecation")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 222 && data != null) {
-            authManager.updateAuthState(data)
+            Screen(
+                authorizedStatus = authManager.authState.toString(),
+                responseData = responseData,
+                onAuthorizeClick = {
+                    authManager.requestAuthorization(this)
+                },
+                onTokenizeClick = {
+                    lifecycleScope.launch {
+                        authManager.requestToken()
+                        withContext(Dispatchers.Main) {
+                            comp()
+                        }
+                    }
+                },
+                onRequestClick = {
+                    lifecycleScope.launch {
+                        try {
+                            val profile = RetrofitBuilder.bungieService.getProfile()
+                            Log.d("araiff", profile.Response.orEmpty())
+                        } catch (e: Exception) {
+                            Log.e("araiff", e.message.orEmpty())
+                        }
+                    }
+                }
+            )
         }
     }
 }
 
 @Composable
-fun Screen(status: String, onLoginClick: () -> Unit) {
+fun Screen(
+    authorizedStatus: String,
+    responseData: String?,
+    onAuthorizeClick: () -> Unit,
+    onTokenizeClick: () -> Unit,
+    onRequestClick: () -> Unit
+) {
     BountyBuddyTheme {
         Surface(color = MaterialTheme.colors.background) {
             LazyColumn {
-                item { Button(onClick = onLoginClick) { Text("Login") } }
-                item { Text(status) }
+                item {
+                    Row {
+                        Button(onClick = onAuthorizeClick) { Text("Authorize") }
+                        Button(onClick = onTokenizeClick) { Text("Get Token") }
+                    }
+                }
+                item { Text(authorizedStatus) }
+                item { Button(onClick = onRequestClick) { Text("Make Request") } }
+                item { Text(responseData.orEmpty()) }
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    Screen("Hello World! ".repeat(200)) {}
 }

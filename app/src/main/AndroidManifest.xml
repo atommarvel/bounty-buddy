@@ -18,10 +18,22 @@
 			android:name=".MainActivity"
 			android:exported="true"
 			android:label="@string/app_name"
-			android:theme="@style/Theme.BountyBuddy.NoActionBar">
+			android:theme="@style/Theme.BountyBuddy.NoActionBar"
+			android:launchMode="singleTop">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+
+				<data
+					android:scheme="com.radiantmood.bountybuddy"
+					android:host="v1"
+					android:path="/oauth" />
 			</intent-filter>
 		</activity>
 		<activity
@@ -35,7 +47,7 @@
 				<category android:name="android.intent.category.BROWSABLE" />
 
 				<data
-					android:scheme="com.radiantmood.bountybuddy"
+					android:scheme="com.radiantmood.bountybuddy.old"
 					android:host="v1"
 					android:path="/oauth" />
 			</intent-filter>
