@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     lifecycleScope.launch {
                         try {
                             val profile = RetrofitBuilder.bungieService.getProfile()
-                            Log.d("araiff", profile.Response.orEmpty())
+                            Log.d("araiff", profile.toString())
                         } catch (e: Exception) {
                             Log.e("araiff", e.message.orEmpty())
                         }

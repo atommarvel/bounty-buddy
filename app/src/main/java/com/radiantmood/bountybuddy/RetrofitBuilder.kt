@@ -10,9 +10,15 @@ import retrofit2.Retrofit
 object RetrofitBuilder {
     private val json = Json { ignoreUnknownKeys = true }
 
+    val authClient by lazy {
+        val builder = OkHttpClient.Builder()
+        App.devtool.addNetworkInterceptor(builder)
+        builder.build()
+    }
+
     val client by lazy {
         val builder = OkHttpClient.Builder()
-//            .addInterceptor(ApiKeyInterceptor())
+            .addInterceptor(ApiKeyInterceptor())
         App.devtool.addNetworkInterceptor(builder)
         builder.build()
     }

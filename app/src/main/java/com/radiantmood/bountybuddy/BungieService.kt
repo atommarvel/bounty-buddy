@@ -1,15 +1,15 @@
 package com.radiantmood.bountybuddy
 
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import retrofit2.http.GET
 
 interface BungieService {
 
     @GET("User/GetMembershipsForCurrentUser")
-    suspend fun getProfile(): ProfileResponse
+    suspend fun getProfile(): JsonElement
 }
 
-@Serializable
-data class ProfileResponse(
-    val Response: String?
-)
+//@Serializable
+//data class ProfileResponse(
+//    val Response:
+//)

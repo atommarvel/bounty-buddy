@@ -63,7 +63,7 @@ class AuthManager {
             .post("grant_type=authorization_code&code=${authState.code.orEmpty()}&client_id=${clientId}".toRequestBody(form))
             .build()
         withContext(Dispatchers.IO) {
-            val res = RetrofitBuilder.client.newCall(req).execute()
+            val res = RetrofitBuilder.authClient.newCall(req).execute()
             val parsedResponse = Json.decodeFromString<TokenResponse>(res.body?.string().orEmpty())
             authState = authState.copy(token = parsedResponse.access_token, tokenExpiry = parsedResponse.expires_in)
             Log.d("araiff", parsedResponse.toString())
