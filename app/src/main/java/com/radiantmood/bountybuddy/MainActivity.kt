@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Button
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -22,7 +23,9 @@ import kotlinx.coroutines.withContext
 class MainActivity : ComponentActivity() {
 
     private val authManager get() = App.authManager
-    private var responseData: String? = null
+    private var userInfoData: String? = null
+    private var manifestData: String? = null
+    private var bountyData: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,32 +37,51 @@ class MainActivity : ComponentActivity() {
         comp()
     }
 
+    private fun onAuthorizeClick() {
+        authManager.requestAuthorization(this)
+    }
+
+    private fun onTokenizeClick() {
+        lifecycleScope.launch {
+            authManager.requestToken()
+            withContext(Dispatchers.Main) {
+                comp()
+            }
+        }
+    }
+
+    private fun onUserInfoReqClick() {
+        lifecycleScope.launch {
+            try {
+                val profile = RetrofitBuilder.bungieService.getProfile()
+                Log.d("araiff", profile.toString())
+                userInfoData = "DisplayName: ${profile.Response.bungieNetUser.displayName}"
+                withContext(Dispatchers.Main) {
+                    comp()
+                }
+            } catch (e: Exception) {
+                Log.e("araiff", e.message.orEmpty())
+            }
+        }
+    }
+
+    private fun onManifestReqClick() {
+        // TODO
+    }
+
+    private fun onBountyReqClick() {
+        // TODO
+    }
+
     private fun comp() {
         setContent {
             Screen(
+                onAuthorizeClick = ::onAuthorizeClick,
+                onTokenizeClick = ::onTokenizeClick,
                 authorizedStatus = authManager.authState.toString(),
-                responseData = responseData,
-                onAuthorizeClick = {
-                    authManager.requestAuthorization(this)
-                },
-                onTokenizeClick = {
-                    lifecycleScope.launch {
-                        authManager.requestToken()
-                        withContext(Dispatchers.Main) {
-                            comp()
-                        }
-                    }
-                },
-                onRequestClick = {
-                    lifecycleScope.launch {
-                        try {
-                            val profile = RetrofitBuilder.bungieService.getProfile()
-                            Log.d("araiff", profile.toString())
-                        } catch (e: Exception) {
-                            Log.e("araiff", e.message.orEmpty())
-                        }
-                    }
-                }
+                onManifestReqClick = ::onManifestReqClick, manifestData = manifestData,
+                onUserInfoReqClick = ::onUserInfoReqClick, userInfoData = userInfoData,
+                onBountyReqClick = ::onBountyReqClick, bountyData = bountyData,
             )
         }
     }
@@ -67,11 +89,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Screen(
+    onAuthorizeClick: () -> Unit, onTokenizeClick: () -> Unit,
     authorizedStatus: String,
-    responseData: String?,
-    onAuthorizeClick: () -> Unit,
-    onTokenizeClick: () -> Unit,
-    onRequestClick: () -> Unit
+    onManifestReqClick: () -> Unit, manifestData: String?,
+    onUserInfoReqClick: () -> Unit, userInfoData: String?,
+    onBountyReqClick: () -> Unit, bountyData: String?,
 ) {
     BountyBuddyTheme {
         Surface(color = MaterialTheme.colors.background) {
@@ -83,8 +105,16 @@ fun Screen(
                     }
                 }
                 item { Text(authorizedStatus) }
-                item { Button(onClick = onRequestClick) { Text("Make Request") } }
-                item { Text(responseData.orEmpty()) }
+                item { Divider() }
+                item { Button(onClick = onManifestReqClick) { Text("Make Manifest Request") } }
+                item { Text(manifestData.orEmpty()) }
+                item { Divider() }
+                item { Button(onClick = onUserInfoReqClick) { Text("Make User Info Request") } }
+                item { Text(userInfoData.orEmpty()) }
+                item { Divider() }
+                item { Button(onClick = onBountyReqClick) { Text("Make Bounty Request") } }
+                item { Text(bountyData.orEmpty()) }
+                item { Divider() }
             }
         }
     }
