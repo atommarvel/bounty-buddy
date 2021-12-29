@@ -16,15 +16,21 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.util.Calendar
+
+fun calendarIn(futureSeconds: Int): Calendar =
+    Calendar.getInstance().apply {
+        add(Calendar.SECOND, futureSeconds)
+    }
 
 class AuthManager {
 
-    val clientId get() = App.getString(R.string.oauth_client_id)
+    private val clientId get() = App.getString(R.string.oauth_client_id)
 
     var authState: AuthState by AuthStateDelegate()
 
     fun requestAuthorization(activity: Activity) {
-        val uri = Uri.parse("https://www.bungie.net/en/oauth/authorize")
+        val uri = Uri.parse("https://www.bungie.net/en/oauth/authorize/")
             .buildUpon()
             .appendQueryParameter("response_type", "code")
             .appendQueryParameter("client_id", clientId)
@@ -36,13 +42,13 @@ class AuthManager {
     suspend fun requestToken() {
         val form = "application/x-www-form-urlencoded".toMediaType()
         val req = Request.Builder()
-            .url("https://www.bungie.net/Platform/App/OAuth/token")
+            .url("https://www.bungie.net/Platform/App/OAuth/token/")
             .post("grant_type=authorization_code&code=${authState.code.orEmpty()}&client_id=${clientId}".toRequestBody(form))
             .build()
         withContext(Dispatchers.IO) {
             val res = RetrofitBuilder.authClient.newCall(req).execute()
             val parsedResponse = Json.decodeFromString<TokenResponse>(res.body?.string().orEmpty())
-            authState = authState.copy(token = parsedResponse.access_token, tokenExpiry = parsedResponse.expires_in)
+            authState = authState.copy(token = parsedResponse.access_token, tokenExpiry = calendarIn(parsedResponse.expires_in))
             Log.d("araiff", parsedResponse.toString())
         }
     }

@@ -37,5 +37,5 @@ object RetrofitBuilder {
 
     val bungieService: BungieService = retrofit.create(BungieService::class.java)
 
-    private const val BASE_URL = "https://www.bungie.net/Platform/"
+    private const val BASE_URL = "https://www.bungie.net/"
 }
