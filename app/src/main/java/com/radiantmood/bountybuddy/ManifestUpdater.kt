@@ -25,6 +25,7 @@ import java.util.zip.ZipInputStream
  * About the manifest: https://github.com/Bungie-net/api/wiki/Obtaining-Destiny-Definitions-%22The-Manifest%22
  * A site explore manifest data: https://data.destinysets.com/
  * Someone's exploration of the api: https://github.com/vpzed/Destiny2-API-Info-wiki/blob/master/API-Introduction-Part-3-Manifest.md
+ * Official api doc: https://bungie-net.github.io/multi/index.html
  */
 class ManifestUpdater(private val statusCallback: (String) -> Unit, private val activity: Activity) {
     var manifestMap: JsonElement? = null
