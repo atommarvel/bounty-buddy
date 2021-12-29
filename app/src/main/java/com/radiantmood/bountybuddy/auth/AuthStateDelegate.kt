@@ -13,7 +13,7 @@ import kotlin.reflect.KProperty
  */
 class AuthStateDelegate {
     private var _authState: AuthState? = null
-    private val prefs: SharedPreferences get() = App.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences get() = App.getSharedPreferences("bountybuddy", Context.MODE_PRIVATE)
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): AuthState {
         if (_authState == null) {

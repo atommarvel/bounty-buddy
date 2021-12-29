@@ -2,6 +2,7 @@ package com.radiantmood.bountybuddy
 
 import android.app.Application
 import com.radiantmood.bountybuddy.auth.AuthManager
+import com.radiantmood.bountybuddy.db.WorldContentRepository
 import com.radiantmood.bountybuddy.dev.Devtool
 
 lateinit var App: BuddyBountyApp
@@ -16,4 +17,5 @@ class BuddyBountyApp : Application() {
 
     val devtool by lazy { Devtool() }
     val authManager by lazy { AuthManager() }
+    val contentRepo by lazy { WorldContentRepository() }
 }
