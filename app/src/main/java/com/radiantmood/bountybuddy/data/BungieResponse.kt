@@ -2,6 +2,9 @@ package com.radiantmood.bountybuddy.data
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Base class for most responses in Bungie's API
+ */
 @Serializable
 abstract class BungieResponse {
     var ErrorCode: Int? = null

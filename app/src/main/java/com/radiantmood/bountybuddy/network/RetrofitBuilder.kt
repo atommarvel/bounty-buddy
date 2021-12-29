@@ -10,15 +10,19 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 
 object RetrofitBuilder {
+    private const val BASE_URL = "https://www.bungie.net/"
     private val json = Json { ignoreUnknownKeys = true }
 
+    /**
+     * For making auth token calls (auth headers make those calls fail).
+     */
     val authClient by lazy {
         val builder = OkHttpClient.Builder()
         App.devtool.addNetworkInterceptor(builder)
         builder.build()
     }
 
-    val client by lazy {
+    private val bungieClient by lazy {
         val builder = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
         App.devtool.addNetworkInterceptor(builder)
@@ -29,13 +33,11 @@ object RetrofitBuilder {
     private val retrofit: Retrofit by lazy {
         val contentType = "application/json".toMediaType()
         Retrofit.Builder()
-            .client(client)
+            .client(bungieClient)
             .baseUrl(BASE_URL)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
     }
 
     val bungieService: BungieService = retrofit.create(BungieService::class.java)
-
-    private const val BASE_URL = "https://www.bungie.net/"
 }

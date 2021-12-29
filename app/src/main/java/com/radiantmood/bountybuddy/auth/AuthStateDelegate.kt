@@ -8,6 +8,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.reflect.KProperty
 
+/**
+ * Delegate that writes [AuthState] to shared prefs any time the value has its value set.
+ */
 class AuthStateDelegate {
     private var _authState: AuthState? = null
     private val prefs: SharedPreferences get() = App.getSharedPreferences("auth", Context.MODE_PRIVATE)

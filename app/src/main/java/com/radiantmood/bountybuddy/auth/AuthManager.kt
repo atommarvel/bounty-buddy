@@ -9,6 +9,7 @@ import com.radiantmood.bountybuddy.App
 import com.radiantmood.bountybuddy.R
 import com.radiantmood.bountybuddy.data.TokenResponse
 import com.radiantmood.bountybuddy.network.RetrofitBuilder
+import com.radiantmood.bountybuddy.util.calendarIn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -16,12 +17,6 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.util.Calendar
-
-fun calendarIn(futureSeconds: Int): Calendar =
-    Calendar.getInstance().apply {
-        add(Calendar.SECOND, futureSeconds)
-    }
 
 class AuthManager {
 
@@ -48,25 +43,32 @@ class AuthManager {
         withContext(Dispatchers.IO) {
             val res = RetrofitBuilder.authClient.newCall(req).execute()
             val parsedResponse = Json.decodeFromString<TokenResponse>(res.body?.string().orEmpty())
-            authState = authState.copy(token = parsedResponse.access_token, tokenExpiry = calendarIn(parsedResponse.expires_in))
+            authState = authState.copy(
+                token = parsedResponse.access_token,
+                tokenExpiry = calendarIn(parsedResponse.expires_in),
+                membershipId = parsedResponse.membership_id
+            )
             Log.d("araiff", parsedResponse.toString())
         }
     }
 
     fun parsePossibleAuthRedirect(intent: Intent) {
-        //com.radiantmood.bountybuddy://v1/oauth?code=XXX&state=XXX
         intent.data?.takeIf { it.isAuthRedirect() }?.let {
             val authorizationCode = it.getQueryParameter("code")
             authState = authState.copy(code = authorizationCode)
         }
     }
 
+    /**
+     * Example auth redirect uri:
+     *  com.radiantmood.bountybuddy://v1/oauth?code=XXX&state=XXX
+     */
     private fun Uri.isAuthRedirect() = (scheme == "com.radiantmood.bountybuddy" &&
         host == "v1" &&
         path == "/oauth" &&
         getQueryParameter("state") == OAUTH_REQ_CODE)
 
     companion object {
-        const val OAUTH_REQ_CODE = "222" // TODO: generate state key value
+        const val OAUTH_REQ_CODE = "222" // TODO: generate state key value each time its used
     }
 }

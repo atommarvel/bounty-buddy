@@ -6,6 +6,6 @@ inline fun tryLog(block: () -> Unit) {
     try {
         block()
     } catch (e: Exception) {
-        Log.d("araiff", e.message.orEmpty())
+        Log.e("araiff", e.message, e)
     }
 }

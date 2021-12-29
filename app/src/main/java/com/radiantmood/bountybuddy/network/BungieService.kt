@@ -20,12 +20,4 @@ interface BungieService {
         @Path("destinyMembershipId") destinyMembershipId: String,
         @Query("components") components: String,
     ): JsonElement
-
-    @GET("Platform/Destiny2/{membershipType}/Profile/{destinyMembershipId}/Character/{characterId}/")
-    suspend fun getCharacter(
-        @Path("membershipType") membershipType: Int,
-        @Path("destinyMembershipId") destinyMembershipId: String,
-        @Path("characterId") characterId: String,
-        @Query("components") components: String,
-    )
 }

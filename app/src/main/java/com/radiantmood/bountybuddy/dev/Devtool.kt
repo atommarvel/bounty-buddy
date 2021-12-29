@@ -7,6 +7,9 @@ import com.facebook.soloader.SoLoader
 import com.radiantmood.bountybuddy.App
 import okhttp3.OkHttpClient
 
+/**
+ * Facebook Flipper integration
+ */
 class Devtool {
 
     private val networkPlugin: NetworkFlipperPlugin = NetworkFlipperPlugin()
