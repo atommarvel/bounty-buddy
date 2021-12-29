@@ -1,13 +1,11 @@
 package com.radiantmood.bountybuddy
 
 import android.app.Activity
+import com.radiantmood.bountybuddy.data.ManifestDataResponse
 import com.radiantmood.bountybuddy.network.RetrofitBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.Request
 import okio.buffer
 import okio.sink
@@ -28,12 +26,12 @@ import java.util.zip.ZipInputStream
  * Official api doc: https://bungie-net.github.io/multi/index.html
  */
 class ManifestUpdater(private val statusCallback: (String) -> Unit, private val activity: Activity) {
-    var manifestMap: JsonElement? = null
+    var manifestResponse: ManifestDataResponse? = null
     var version: String by ManifestVersionDelegate()
 
     suspend fun updateManifest() = withContext(Dispatchers.IO) {
-        manifestMap = RetrofitBuilder.bungieService.getManifest()
-        val newestVersion = manifestMap?.jsonObject?.get("Response")?.jsonObject?.get("version")?.jsonPrimitive?.content
+        manifestResponse = RetrofitBuilder.bungieService.getManifest()
+        val newestVersion = manifestResponse?.Response?.version
         statusCallback.invoke("Current version is $version.")
         statusCallback.invoke("Newest version is $newestVersion.")
         if (newestVersion != null && newestVersion != version) {
@@ -50,7 +48,7 @@ class ManifestUpdater(private val statusCallback: (String) -> Unit, private val 
     @Throws(Exception::class)
     private suspend fun fetchItemManifest() = withContext(Dispatchers.IO) {
         val req = Request.Builder()
-            .url("https://www.bungie.net" + getWorldContentPath(manifestMap))
+            .url("https://www.bungie.net" + getWorldContentPath(manifestResponse))
             .build()
         val res = RetrofitBuilder.authClient.newCall(req).execute()
         val zip = File(activity.cacheDir, "world_content.zip")
@@ -96,7 +94,7 @@ class ManifestUpdater(private val statusCallback: (String) -> Unit, private val 
     }
 
     @Throws(Exception::class)
-    private fun getWorldContentPath(jsonElement: JsonElement?): String {
-        return checkNotNull(jsonElement?.jsonObject?.get("Response")?.jsonObject?.get("mobileWorldContentPaths")?.jsonObject?.get("en")?.jsonPrimitive?.content)
+    private fun getWorldContentPath(response: ManifestDataResponse?): String {
+        return checkNotNull(response?.Response?.mobileWorldContentPaths?.en)
     }
 }

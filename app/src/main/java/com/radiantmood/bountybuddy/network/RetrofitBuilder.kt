@@ -11,7 +11,11 @@ import retrofit2.Retrofit
 
 object RetrofitBuilder {
     private const val BASE_URL = "https://www.bungie.net/"
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        isLenient = true
+        encodeDefaults = true
+    }
 
     /**
      * For making auth token calls (auth headers make those calls fail).
