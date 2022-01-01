@@ -53,11 +53,13 @@ class AuthManager {
         withContext(Dispatchers.IO) {
             val res = RetrofitBuilder.authClient.newCall(req).execute()
             val parsedResponse = Json.decodeFromString<TokenResponse>(res.body?.string().orEmpty())
-            authState = authState.copy(
-                token = parsedResponse.access_token,
-                tokenExpiry = calendarIn(parsedResponse.expires_in),
-                membershipId = parsedResponse.membership_id
-            )
+            if (parsedResponse.error == null) {
+                authState = authState.copy(
+                    token = parsedResponse.access_token,
+                    tokenExpiry = calendarIn(parsedResponse.expires_in!!),
+                    membershipId = parsedResponse.membership_id
+                )
+            }
             Log.d("araiff", parsedResponse.toString())
         }
     }
