@@ -3,7 +3,7 @@ package com.radiantmood.bountybuddy
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
-import com.radiantmood.bountybuddy.data.InventoryItem
+import com.radiantmood.bountybuddy.data.DestinyItemComponent
 import com.radiantmood.bountybuddy.data.MembershipDataResponse
 import com.radiantmood.bountybuddy.data.ProfileDataResponse
 import com.radiantmood.bountybuddy.data.getPopularCharacter
@@ -68,7 +68,7 @@ class OperationalDataFetcher(
         tryLog("Failed to compile inventory data.") {
             val strongestChar = checkNotNull(profileData?.Response?.characters?.getPopularCharacter())
             val inventory = checkNotNull(profileData?.Response?.characterInventories?.data?.get(strongestChar.characterId)?.items)
-            val inventoryBounties = mutableListOf<InventoryItem>()
+            val inventoryBounties = mutableListOf<DestinyItemComponent>()
             val bounties = inventory.mapNotNull { inventoryItem ->
                 contentRepo.getItem(inventoryItem.itemHash)?.let { item ->
                     item.jsonObject["itemType"]?.jsonPrimitive?.intOrNull?.let { itemType ->
@@ -122,15 +122,6 @@ class OperationalDataFetcher(
             )
             statusCallback.invoke("Profile obtained.")
             runState()
-        }
-    }
-
-    private suspend fun accessDb() {
-        tryLog("failed to access db") {
-            val item = contentRepo.getItem("2147433548")
-            item?.let {
-                statusCallback.invoke(it.toPrettyString())
-            }
         }
     }
 

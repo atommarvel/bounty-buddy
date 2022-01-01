@@ -18,7 +18,7 @@ interface BungieService {
     @GET("Platform/Destiny2/{membershipType}/Profile/{destinyMembershipId}/")
     suspend fun getDestinyProfile(
         @Path("membershipType") membershipType: Int,
-        @Path("destinyMembershipId") destinyMembershipId: String,
+        @Path("destinyMembershipId") destinyMembershipId: Long,
         @Query("components") components: String,
     ): ProfileDataResponse
 }

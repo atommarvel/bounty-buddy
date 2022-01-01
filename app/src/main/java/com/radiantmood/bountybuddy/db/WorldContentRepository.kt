@@ -20,13 +20,13 @@ class WorldContentRepository {
         return checkNotNull(_db)
     }
 
-    suspend fun getItem(itemId: String): JsonElement? {
+    suspend fun getItem(itemId: UInt): JsonElement? {
         return getJson(WorldContentContract.TABLE_NAME, itemId)
     }
 
-    private suspend fun getJson(table: String, itemId: String): JsonElement? = withContext(Dispatchers.IO) {
+    private suspend fun getJson(table: String, itemId: UInt): JsonElement? = withContext(Dispatchers.IO) {
         // ids provided by the API are unsigned ints, yet the db stores them signed
-        val id = itemId.toUInt().toInt().toString()
+        val id = itemId.toInt().toString()
         val selection = "${WorldContentContract.COLUMN_NAME_ID} = ?"
         val selectionArgs = arrayOf(id)
         val cursor = getDb().query(

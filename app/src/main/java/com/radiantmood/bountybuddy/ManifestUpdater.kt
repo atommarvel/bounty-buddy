@@ -24,6 +24,7 @@ import java.util.zip.ZipInputStream
  * A site explore manifest data: https://data.destinysets.com/
  * Someone's exploration of the api: https://github.com/vpzed/Destiny2-API-Info-wiki/blob/master/API-Introduction-Part-3-Manifest.md
  * Official api doc: https://bungie-net.github.io/multi/index.html
+ * Changes to definitions: https://archive.destiny.report/
  */
 class ManifestUpdater(private val statusCallback: (String) -> Unit, private val activity: Activity) {
     var manifestResponse: ManifestDataResponse? = null
