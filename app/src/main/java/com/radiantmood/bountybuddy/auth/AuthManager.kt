@@ -44,7 +44,7 @@ class AuthManager {
         requestToken()
     }
 
-    suspend fun requestToken() {
+    private suspend fun requestToken() {
         val form = "application/x-www-form-urlencoded".toMediaType()
         val req = Request.Builder()
             .url("https://www.bungie.net/Platform/App/OAuth/token/")

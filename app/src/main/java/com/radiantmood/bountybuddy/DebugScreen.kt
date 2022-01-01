@@ -1,10 +1,15 @@
 package com.radiantmood.bountybuddy
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
@@ -23,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberImagePainter
+import com.radiantmood.bountybuddy.data.InventoryItemDefinition
 import com.radiantmood.bountybuddy.ui.theme.BountyBuddyTheme
 
 @Composable
@@ -58,8 +65,22 @@ fun BountiesScreen() {
     }
     LazyColumn {
         items(bounties) { bounty ->
-            Text(bounty)
+            Bounty(bounty)
+            Spacer(Modifier.height(4.dp))
         }
+    }
+}
+
+@Composable
+fun Bounty(bounty: InventoryItemDefinition) {
+    Row {
+        Image(
+            painter = rememberImagePainter("https://www.bungie.net/" + bounty.displayProperties.icon),
+            contentDescription = null,
+            modifier = Modifier.size(80.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(bounty.displayProperties.name)
     }
 }
 

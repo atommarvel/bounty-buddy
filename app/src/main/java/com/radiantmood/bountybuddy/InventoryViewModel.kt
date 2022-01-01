@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.radiantmood.bountybuddy.data.DestinyItemComponent
+import com.radiantmood.bountybuddy.data.InventoryItemDefinition
 import com.radiantmood.bountybuddy.data.getPopularCharacter
 import com.radiantmood.bountybuddy.util.toPrettyString
 import com.radiantmood.bountybuddy.util.tryLog
@@ -14,8 +15,8 @@ import kotlinx.coroutines.launch
 
 class InventoryViewModel : ViewModel() {
     private val contentRepo get() = App.contentRepo
-    private val _bounties = MutableLiveData<List<String>>(listOf())
-    val bounties: LiveData<List<String>> get() = _bounties
+    private val _bounties = MutableLiveData<List<InventoryItemDefinition>>(listOf())
+    val bounties: LiveData<List<InventoryItemDefinition>> get() = _bounties
     private val profileRepository get() = App.profileRepo
 
     fun fetchBounties() {
@@ -42,7 +43,7 @@ class InventoryViewModel : ViewModel() {
                 }
             }
             val bountyNames = bountyContent.map { it.displayProperties.name }
-            _bounties.postValue(bountyNames)
+            _bounties.postValue(bountyContent)
             Log.v("araiff", bountyNames.toString())
             Log.v("araiff", inventoryBounties.first().toPrettyString())
             Log.v("araiff", "\n\nWORLD CONTENT DATAn\n\n")
