@@ -11,9 +11,6 @@ import com.radiantmood.bountybuddy.util.toPrettyString
 import com.radiantmood.bountybuddy.util.tryLog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 class InventoryViewModel : ViewModel() {
     private val contentRepo get() = App.contentRepo
@@ -38,17 +35,13 @@ class InventoryViewModel : ViewModel() {
             val inventoryBounties = mutableListOf<DestinyItemComponent>()
             val bountyContent = inventory.mapNotNull { inventoryItem ->
                 contentRepo.getItem(inventoryItem.itemHash)?.let { item ->
-                    item.jsonObject["itemType"]?.jsonPrimitive?.intOrNull?.let { itemType ->
-                        if (itemType == 26) {
-                            inventoryBounties.add(inventoryItem)
-                            item
-                        } else null
-                    }
+                    if (item.itemType == 26) {
+                        inventoryBounties.add(inventoryItem)
+                        item
+                    } else null
                 }
             }
-            val bountyNames = bountyContent.mapNotNull { item ->
-                item.jsonObject["displayProperties"]?.jsonObject?.get("name")?.jsonPrimitive?.content
-            }
+            val bountyNames = bountyContent.map { it.displayProperties.name }
             _bounties.postValue(bountyNames)
             Log.v("araiff", bountyNames.toString())
             Log.v("araiff", inventoryBounties.first().toPrettyString())

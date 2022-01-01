@@ -11,7 +11,7 @@ import retrofit2.Retrofit
 
 object RetrofitBuilder {
     private const val BASE_URL = "https://www.bungie.net/"
-    private val json = Json {
+    val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
         encodeDefaults = true
