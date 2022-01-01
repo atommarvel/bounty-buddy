@@ -9,28 +9,28 @@ import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private val operationalDataFetcher by lazy { OperationalDataFetcher(this, ::onStatusUpdated) }
-    var status = ""
+    private val operationalDataFetcher by lazy { OperationalDataFetcher(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         comp()
+        lifecycleScope.launch {
+            operationalDataFetcher.assembleData(false)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
         lifecycleScope.launch { operationalDataFetcher.onNewIntent(intent) }
     }
 
-    private fun onStatusUpdated(status: String) {
-        this.status = this.status + status + "\n"
-        comp()
-    }
-
     private fun comp() {
         setContent {
-            DebugScreen(status = status) {
+            DebugScreen(
+                isLoggedIn = operationalDataFetcher.isDataAssembled,
+                isLoading = operationalDataFetcher.isLoading
+            ) {
                 lifecycleScope.launch {
-                    operationalDataFetcher.fetch()
+                    operationalDataFetcher.assembleData()
                 }
             }
         }

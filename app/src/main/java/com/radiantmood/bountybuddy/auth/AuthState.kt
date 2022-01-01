@@ -10,7 +10,7 @@ data class AuthState(
     val token: String? = null,
     @Serializable(CalendarSerializer::class)
     val tokenExpiry: Calendar? = null,
-    val membershipId: String? = null,
+    val membershipId: Long? = null,
 ) {
     fun isTokenExpired(): Boolean = tokenExpiry?.let { Calendar.getInstance().after(it) } ?: true
 }

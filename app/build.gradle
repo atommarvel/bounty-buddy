@@ -65,6 +65,8 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
     implementation "androidx.browser:browser:1.4.0"
     implementation "com.squareup.okio:okio:3.0.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0"
+    implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 
 
     debugImplementation 'com.facebook.flipper:flipper:0.125.0'

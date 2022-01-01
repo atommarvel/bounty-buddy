@@ -24,7 +24,9 @@ class AuthManager {
 
     var authState: AuthState by AuthStateDelegate()
 
-    fun requestAuthorization(activity: Activity) {
+    fun isLoggedOut(): Boolean = authState.code == null || authState.isTokenExpired()
+
+    suspend fun requestAuthorization(activity: Activity) = withContext(Dispatchers.Main) {
         val uri = Uri.parse("https://www.bungie.net/en/oauth/authorize/")
             .buildUpon()
             .appendQueryParameter("response_type", "code")
@@ -32,6 +34,14 @@ class AuthManager {
             .appendQueryParameter("state", OAUTH_REQ_CODE)
             .build()
         CustomTabsIntent.Builder().build().launchUrl(activity, uri)
+    }
+
+    suspend fun authenticateIfNeeded(intent: Intent) = withContext(Dispatchers.IO) {
+        intent.data?.takeIf { it.isAuthRedirect() }?.let {
+            val authorizationCode = it.getQueryParameter("code")
+            authState = authState.copy(code = authorizationCode)
+        }
+        requestToken()
     }
 
     suspend fun requestToken() {
@@ -49,13 +59,6 @@ class AuthManager {
                 membershipId = parsedResponse.membership_id
             )
             Log.d("araiff", parsedResponse.toString())
-        }
-    }
-
-    fun parsePossibleAuthRedirect(intent: Intent) {
-        intent.data?.takeIf { it.isAuthRedirect() }?.let {
-            val authorizationCode = it.getQueryParameter("code")
-            authState = authState.copy(code = authorizationCode)
         }
     }
 

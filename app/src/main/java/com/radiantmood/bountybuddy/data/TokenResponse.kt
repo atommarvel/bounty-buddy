@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class TokenResponse(
     val access_token: String,
     val expires_in: Int,
-    val membership_id: String,
+    val membership_id: Long,
     val token_type: String,
 )

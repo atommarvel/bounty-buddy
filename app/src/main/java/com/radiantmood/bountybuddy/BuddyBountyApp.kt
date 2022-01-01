@@ -18,4 +18,5 @@ class BuddyBountyApp : Application() {
     val devtool by lazy { Devtool() }
     val authManager by lazy { AuthManager() }
     val contentRepo by lazy { WorldContentRepository() }
+    val profileRepo by lazy { ProfileRepository() }
 }

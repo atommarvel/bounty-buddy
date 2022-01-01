@@ -1,6 +1,7 @@
 package com.radiantmood.bountybuddy
 
 import android.app.Activity
+import android.util.Log
 import com.radiantmood.bountybuddy.data.ManifestDataResponse
 import com.radiantmood.bountybuddy.network.RetrofitBuilder
 import kotlinx.coroutines.Dispatchers
@@ -26,23 +27,26 @@ import java.util.zip.ZipInputStream
  * Official api doc: https://bungie-net.github.io/multi/index.html
  * Changes to definitions: https://archive.destiny.report/
  */
-class ManifestUpdater(private val statusCallback: (String) -> Unit, private val activity: Activity) {
-    var manifestResponse: ManifestDataResponse? = null
+class ManifestUpdater(private val activity: Activity) {
+    var isManifestUpdated: Boolean = false
+        private set
+    private var manifestResponse: ManifestDataResponse? = null
     var version: String by ManifestVersionDelegate()
 
     suspend fun updateManifest() = withContext(Dispatchers.IO) {
         manifestResponse = RetrofitBuilder.bungieService.getManifest()
         val newestVersion = manifestResponse?.Response?.version
-        statusCallback.invoke("Current version is $version.")
-        statusCallback.invoke("Newest version is $newestVersion.")
+        Log.v("araiff", "Current version is $version.")
+        Log.v("araiff", "Newest version is $newestVersion.")
         if (newestVersion != null && newestVersion != version) {
-            statusCallback.invoke("Version is older than currently downloaded version. Updating content.")
+            Log.v("araiff", "Version is older than currently downloaded version. Updating content.")
             fetchItemManifest()
             version = newestVersion
-            statusCallback.invoke("Manifest data obtained.")
+            Log.v("araiff", "Manifest data obtained.")
         } else {
-            statusCallback.invoke("No Manifest update needed.")
+            Log.v("araiff", "No Manifest update needed.")
         }
+        isManifestUpdated = true
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -56,12 +60,12 @@ class ManifestUpdater(private val statusCallback: (String) -> Unit, private val 
         val sink = zip.sink().buffer()
         sink.writeAll(res.body!!.source())
         sink.close()
-        statusCallback.invoke("World content zip downloaded.")
+        Log.v("araiff", "World content zip downloaded.")
 
         unzipDb(zip, activity.getDatabasePath("asdf").parentFile)
         zip.delete() // no need to keep around zip download
         // maybe it makes sense to take notes from this to use the downloaded db?? https://stackoverflow.com/questions/10254872/download-sqlite-database-from-internet-and-load-into-android-application
-        statusCallback.invoke("World content unzipped.")
+        Log.v("araiff", "World content unzipped.")
     }
 
     // Grabbed from https://stackoverflow.com/questions/3382996/how-to-unzip-files-programmatically-in-android
